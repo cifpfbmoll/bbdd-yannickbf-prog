@@ -62,7 +62,7 @@ public class Practica8 {
         
     }
     
-    public static void transacciones(Connection con) {
+    public static void transacciones(Connection con) throws SQLException {
         Scanner lector = new Scanner(System.in);
         System.out.println("1-Actualizacion simple");
         System.out.println("2-Transaccion_1");
@@ -73,11 +73,126 @@ public class Practica8 {
             case 1:
                 actualizacionSimple(con);
                 break;
+            case 2:
+                transaccion_1(con);
+                break;
         }
     }
 
-    public static void actualizacionSimple(Connection con) {
-        
+    public static void transaccion_1(Connection con) throws SQLException{
+        //¿Se actualiza la tabla si falla la primera, segunda o tercera sentencia?
+        //¿Y si se ejecuta correctamente las tres primeras sentencias que forman parte de la transacción y falla la última qué ocurre?
+        //¿Qué ocurre si dejas el autocommit a false y ejecutas el apartado b y luego el a?
+        /*con.setAutoCommit(false);
+        String actualitzaPrecioCerveza = "update serves set price=? where bar =? and beer=?";
+        PreparedStatement preciosCervezas = con.prepareStatement(actualitzaPrecioCerveza);
+        preciosCervezas.setDouble(1,2.70);
+        preciosCervezas.setString(2,"Down Under Pub");
+        preciosCervezas.setString(3,"Amstel");
+        int n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+        Statement st = con.createStatement ();
+        int añadirCerveza2 = st.executeUpdate("update serves set price=2.30 where bar ='Down Under Pub' and beer='Budweiser'");
+        int añadirCerveza3 = st.executeUpdate("update serves set price=2.80 where bar ='Down Under Pub' and beer='Corona'");
+        con.commit();
+        int añadirCerveza4 = st.executeUpdate("update serves set price=2.45 where bar ='James Joyce Pub' and beer='Amstel'");
+        //con.setAutoCommit(true);
+        preciosCervezas.close();
+        st.close();*/
+        /*
+        try{
+            con.setAutoCommit(false);
+            String actualitzaPrecioCerveza = "update serves set price=? where bar =? and beer=?";
+            PreparedStatement preciosCervezas = con.prepareStatement(actualitzaPrecioCerveza);
+            preciosCervezas.setDouble(1,2.70);
+            preciosCervezas.setString(2,"Down Under Pub");
+            preciosCervezas.setString(3,"Amstel");
+            int n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+            Statement st = con.createStatement ();
+            int añadirCerveza2 = st.executeUpdate("update serves set price=2.30 where bar ='Down Under Pub' and beer='Budweiser'");
+            int añadirCerveza3 = st.executeUpdate("update serves set price=2.80 where bar ='Down Under Pub' and beer='Corona'");
+            con.commit();
+            int añadirCerveza4 = st.executeUpdate("update serves set price=2.45 where bar ='James Joyce Pub' and beer='Amstel'");
+            preciosCervezas.close();
+            st.close();
+        }
+        catch(SQLException ex){
+            System.out.println("SQLSTATE " + ex.getSQLState() + "SQLMESSAGE" +      ex.getMessage());
+            System.out.println("Hago rollback");
+            con.rollback();    
+        }
+        finally{
+            con.setAutoCommit(true);
+        }
+        */
+        try{
+            con.setAutoCommit(false);
+            String actualitzaPrecioCerveza = "update serves set price=? where bar =? and beer=?";
+            PreparedStatement preciosCervezas = con.prepareStatement(actualitzaPrecioCerveza);
+            preciosCervezas.setDouble(1,2.70);
+            preciosCervezas.setString(2,"Down Under Pub");
+            preciosCervezas.setString(3,"Amstel");
+            int n;
+            n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+            preciosCervezas.setDouble(1,2.70);
+            preciosCervezas.setString(2,"Down Under Pub");
+            preciosCervezas.setString(3,"Budweiser");
+            n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+            preciosCervezas.setDouble(1,2.70);
+            preciosCervezas.setString(2,"Down Under Pub");
+            preciosCervezas.setString(3,"Corona");
+            n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+            con.commit();
+            preciosCervezas.setDouble(1,2.70);
+            preciosCervezas.setString(2,"James Joyce Pub");
+            preciosCervezas.setString(3,"Amstel");
+            n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+        }
+        catch(SQLException ex){
+            System.out.println("SQLSTATE " + ex.getSQLState() + "SQLMESSAGE" +      ex.getMessage());
+            System.out.println("Hago rollback");
+            con.rollback();    
+        }
+        finally{
+            con.setAutoCommit(true);
+        }
+    }
+
+    public static void actualizacionSimple(Connection con) throws SQLException {
+        //¿Se actualiza la tabla si falla la primera sentencia? 
+        //Si, se actualiza con la segunda sentencia, esto es por el autocommit
+        //¿Y si falla la segunda se actualiza la primera?
+        //Si, tambien, tambien por el autocommit
+        Statement st = con.createStatement ();
+        int añadirCerveza2 = st.executeUpdate("update serves set price=2.50 where bar ='Down Under Pub' and beer='Budweiser'");
+        int añadirCerveza3 = st.executeUpdate("update serves set price=2.50 where bar ='Down Under Pub' and beer='Corona'");
+        st.close();
+        /*Scanner lector = new Scanner(System.in);
+        System.out.println("Cambiar precio de cerveza en bar1");
+        System.out.println("Dime que en que bar quieres cambiar la cerveza");
+        String bar = lector.nextLine();
+        System.out.println("Dime de que cerveza quieres cambiar el precio");
+        String cerveza = lector.next();
+        System.out.println("Dime a que precio quieres actualizar el precio de la cerveza");
+        double precio = lector.nextDouble();
+        String actualitzaPrecioCerveza = "update serves set price=? where bar =? and beer=?";
+        PreparedStatement preciosCervezas = con.prepareStatement(actualitzaPrecioCerveza);
+        preciosCervezas.setDouble(1,precio);
+        preciosCervezas.setString(2,bar);
+        preciosCervezas.setString(3,cerveza);
+        int n = preciosCervezas.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.
+        System.out.println("Cambiar precio de cerveza en bar2");  
+        System.out.println("Dime que en que bar quieres cambiar la cerveza");
+        String bar2 = lector.nextLine();
+        System.out.println("Dime de que cerveza quieres cambiar el precio");
+        String cerveza2 = lector.next();
+        System.out.println("Dime a que precio quieres actualizar el precio de la cerveza");
+        double precio2 = lector.nextDouble();      
+        String actualitzaPrecioCerveza2 = "update serves set price=? where bar =? and beer=?";
+        PreparedStatement preciosCervezas2 = con.prepareStatement(actualitzaPrecioCerveza2);
+        preciosCervezas2.setDouble(1,precio);
+        preciosCervezas2.setString(2,bar);
+        preciosCervezas2.setString(3,cerveza);
+        int j = preciosCervezas2.executeUpdate (); // Ejecuta la sentencia con los valores // suministrados.*/
     }
     
     public static void updateTabla(Connection con) throws SQLException {
@@ -129,13 +244,13 @@ public class Practica8 {
         String data = "----\nSe ha consultado el precio de una cerveza determinada en un bar determinado. Bar: "+bar+". Cerveza: "+cerveza+"\n";
         
         try {
-            while (results.next ()) {
-                String nombreBar = results.getString ("bar");
-                String nombreBeer = results.getString ("beer");
-                String precio = results.getString ("price");
-                System.out.println("La cerveza: "+nombreBeer+" vale "+precio+"€ en el bar: "+nombreBar);
-                data += "La cerveza: "+nombreBeer+" vale "+precio+"€ en el bar: "+nombreBar+"\n----";
-            }
+            results.next ();
+            String nombreBar = results.getString ("bar");
+            String nombreBeer = results.getString ("beer");
+            String precio = results.getString ("price");
+            System.out.println("La cerveza: "+nombreBeer+" vale "+precio+"€ en el bar: "+nombreBar);
+            data += "La cerveza: "+nombreBeer+" vale "+precio+"€ en el bar: "+nombreBar+"\n----";
+            
             File file = new File("logderesultadosbusquedacerveza.txt");
             // Si el archivo no existe, se crea!
             if (!file.exists()) {

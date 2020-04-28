@@ -26,4 +26,7 @@ La cerveza: Amstel vale 3.00€ en el bar: James Joyce Pub
 La cerveza: Amstel vale 2.75€ en el bar: Satisfaction
 La cerveza: Amstel vale 2.50€ en el bar: Talk of the Town
 La cerveza: Amstel vale 2.75€ en el bar: The Edge
+--------
+Se ha consultado el precio de una cerveza determinada en un bar determinado. Bar: Down Under Pub. Cerveza: Amstel
+La cerveza: Amstel vale 2.00€ en el bar: Down Under Pub
 ----
